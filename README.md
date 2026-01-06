@@ -4,7 +4,7 @@ A simple, offline browser-based farming game built with **HTML, CSS, and JavaScr
 
 Plant crops, wait for them to grow, harvest them for coins and XP, unlock more land, and progress through the game - No backend required.
 
-🔗 **Play here:** https://sythegivry.github.io/your-repo-name/
+🔗 **Play here:** https://sythegivry.github.io/FarmingGame/
 
 ---
 
