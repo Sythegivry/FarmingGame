@@ -70,14 +70,6 @@ const CROPS = {
         rarity: "common",
         unlockLevel: 1
     },
-    devCrop: {
-        name: "Debug",
-        category: "crop",
-        time: 2000,
-        value: 2000,
-        rarity: "common",
-        unlockLevel: 1
-    },
     carrot: {
         name: "Carrot", 
         category: "crop",
