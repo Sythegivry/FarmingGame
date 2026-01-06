@@ -1,3 +1,144 @@
+// Time utils
+const TIME_FORMATS = {
+    SECOND: 1000,
+    MINUTE: 60 * 1000,
+    HOUR: 60 * 60 * 1000,
+    DAY: 24 * 60 * 60 * 1000 
+};
+
+// Formats a remaining time (ms) into a short string ("2h 5m")
+function formatTimeRemaining(ms) {
+    if (ms <= 0) return "Ready!";
+
+    const totalSeconds = Math.ceil(ms / 1000);
+
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    
+    if (days > 0) return `${days}d ${hours}h`;
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    if (minutes > 0) return `${minutes}m ${seconds}s`;
+    return `${seconds}s`;
+}
+
+// Return crop growth progress
+function getGrowthProgress(tile) {
+    if (!tile.isGrowing() || !tile.plantedAt || !tile.cropId)
+    return 0;
+
+    const elapsed = Date.now() - tile.plantedAt;
+    const totalTime = GameData.getCropGrowTime(tile.cropId);
+    return Math.min(elapsed / totalTime, 1); // Claimp UI bars if timers desync
+}
+
+// ======== Save & Load System ========
+function saveGame() {
+    const saveData = {
+        version: "0.1",
+        coins: farm.coins,
+        selectedCrop: farm.selectedCrop,
+        farmGrid: farm.grid.map(tile => ({
+            state: tile.state,
+            cropId: tile.cropId,
+            plantedAt: tile.plantedAt
+        })),
+        lastSavedAt: Date.now()
+    };
+    
+    try {
+        localStorage.setItem("farmGame", JSON.stringify(saveData));
+        showSaveStatus("Game saved!");
+        return true;
+    } catch (error) {
+        console.error("Failed to save game:", error);
+        showSaveStatus("Save failed!");
+        return false;
+    }
+}
+
+function loadGame() {
+    const data = localStorage.getItem("farmGame");
+    if (!data) return false;
+    
+    try {
+        const save = JSON.parse(data);
+        farm.coins = save.coins || 0;
+        farm.selectedCrop = save.selectedCrop || 'carrot';
+        
+        // Restore grid
+        farm.grid = save.farmGrid.map(tileData => {
+            const tile = new Tile();
+            tile.state = tileData.state || TILE_STATE.EMPTY;
+            tile.cropId = tileData.cropId;
+            tile.plantedAt = tileData.plantedAt;
+            
+            // Check offline growth
+            if (tile.isGrowing() && tile.plantedAt && tile.cropId) {
+                tile.checkGrowthProgress();
+            }
+            
+            return tile;
+        });
+        
+        // Load notification
+        const readyCrops = farm.grid.filter(tile => tile.isReady()).length;
+        if (readyCrops > 0) {
+            setTimeout(() => {
+                alert(`Welcome back! ${readyCrops} crop${readyCrops > 1 ? 's are' : ' is'} ready to harvest!`);
+            }, 500);
+        }
+        
+        showSaveStatus("Game loaded!");
+        return true;
+    } catch (error) {
+        console.error("Failed to load game:", error);
+        showSaveStatus("Load failed!");
+        return false;
+    }
+}
+
+// Temporary 3s save status message with visual feedback and console fallback
+function showSaveStatus(message) {
+    const statusEl = document.getElementById("save-status");
+    if (statusEl) {
+        statusEl.textContent = message;
+        statusEl.style.display = "block";
+        statusEl.style.background = message.includes("failed") ? "#ffebee" : "#e8f5e8";
+        statusEl.style.color = message.includes("failed") ? "#c62828" : "#2e7d32";
+        setTimeout(() => {
+            statusEl.style.display = "none";
+        }, 3000);
+    } else {
+        // Fallback console
+        console.log(message);
+    }
+}
+
+function clearSave() {
+    if (confirm("Do you REALLY want to clear your save data? This cannot be undone!")) {
+        localStorage.removeItem("farmGame");
+        showSaveStatus("Welp, there it goes, bye save data.");
+    }
+}
+
+// Auto-save on 60s
+let autoSaveInterval;
+function startAutoSave() {
+    autoSaveInterval = setInterval (() => {
+        console.log("Auto-saving game...");
+        saveGame();
+    }, 60000);
+}
+        
+function stopAutoSave() {
+    if (autoSaveInterval) {
+        clearInterval(autoSaveInterval);
+        autoSaveInterval = null;
+    }
+}
+
 // Tile State System
 const TILE_STATE = {
     EMPTY: "empty",
@@ -56,6 +197,14 @@ class Tile {
             }
         }
         return false; // No state change
+    }
+    getTimeRemaining(){
+        if (!this.isGrowing() || !this.plantedAt || !this.cropId)
+            return 0;
+
+        const elapsed = Date.now() - this.plantedAt;
+        const totalTime = GameData.getCropGrowTime(this.cropId);
+        return Math.max(totalTime - elapsed, 0);
     }
 }
 
@@ -240,7 +389,26 @@ const CROPS = {
         icon: '🌾',
         rarity: "common",
         unlockLevel: 1
-    }
+    },
+    // High-value crops
+    golden_wheat: {
+        name: "Golden Wheat",
+        category: "crop",
+        time: 4 * TIME_FORMATS.HOUR, // 4 hours
+        value: 150,
+        icon: '🌾',
+        rarity: "legendary",
+        unlockLevel: 15
+    },
+    mystic_berry: {
+        name: "Mystic Berry",
+        category: "crop", 
+        time: 2 * TIME_FORMATS.DAY, // 2 days
+        value: 500,
+        icon: '🫐',
+        rarity: "mythic",
+        unlockLevel: 25
+    },
 };
 
 // Game Data Manager
@@ -282,7 +450,7 @@ const GROW_TIME = 5000; // 5 seconds
 const farm = {
     coins: 0,
     grid: [],
-    selectedCrop: 'corn'
+    selectedCrop: 'corn' // Default selected crop
 };
 
 // Init tile structure
@@ -311,7 +479,19 @@ function render() {
             el.textContent = "Empty";
         } else if (tile.isGrowing()) {
             el.classList.add('growing');
-            el.textContent = "🌱";
+            
+            // Show time remaining
+            const progress = getGrowthProgress(tile);
+            const timeRemaining = tile.getTimeRemaining();
+            
+            el.innerHTML = `
+            <div class="crop-content">
+            <div class="crop-emoji">🌱</div>
+            <div class="progress-bar">
+            <div class="progress-fill" style="width: ${progress * 100}%"></div>
+            </div>
+            <div class="time-remaining">${formatTimeRemaining(timeRemaining)}</div>
+            </div>`;
         } else if (tile.isReady()) {
             el.classList.add('ready');
             const cropIcon = GameData.getCropIcon(tile.cropId);
@@ -395,9 +575,30 @@ function initCropSelector() {
     updateCropSelectorUI();
 }
 
+function initSaveLoadButtons() {
+    const saveBtn = document.getElementById("manual-save-button");
+    const loadBtn = document.getElementById("manual-load-button");
+    
+    if (saveBtn) {
+        saveBtn.onclick = () => {
+            saveGame();
+        };
+    }
+    
+    if (loadBtn) {
+        loadBtn.onclick = () => {
+            loadGame();
+            render(); // Refresh display after loading
+        };
+    }
+}
+    
+
 // Initialize
 initCropSelector();
+initSaveLoadButtons();
 render();
+startAutoSave();
 
 // Game Loop
 setInterval(render, 1000);
