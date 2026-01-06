@@ -213,189 +213,189 @@ const CROPS = {
     corn: {
         name: "Corn",
         category: "crop",
-        time: 7000,
-        value: 15,
+        time: 20000,
+        value: 10,
         icon: '🌽',
         rarity: "common",
-        unlockLevel: 1
+        unlockLevel: 0
     },
     carrot: {
         name: "Carrot", 
         category: "crop",
-        time: 3000,
-        value: 5,
+        time: 30000,
+        value: 17,
         icon: '🥕',
         rarity: "common",
-        unlockLevel: 1
+        unlockLevel: 2
     },
     rice: {
         name: "Rice",
         category: "crop", 
-        time: 4500,
-        value: 7,
+        time: 1 * TIME_FORMATS.DAY,
+        value: 760,
         icon: '🌾',
-        rarity: "common",
-        unlockLevel: 1
+        rarity: "rare",
+        unlockLevel: 3
     },
     barley: {
         name: "Barley",
         category: "crop",
-        time: 4500, 
-        value: 7,
+        time: 8 * TIME_FORMATS.HOUR,
+        value: 360,
         icon: '🌾',
-        rarity: "common",
-        unlockLevel: 1
+        rarity: "rare",
+        unlockLevel: 3
     },
     cabbage: {
         name: "Cabbage",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 4 * TIME_FORMATS.MINUTE,
+        value: 33,
         icon: '🥬',
         rarity: "common", 
-        unlockLevel: 1
+        unlockLevel: 4
     },
     peppers: {
         name: "Peppers",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 18 * TIME_FORMATS.MINUTE,
+        value: 90,
         icon: '🫑',
         rarity: "common",
-        unlockLevel: 1
+        unlockLevel: 4
     },
     coffee: {
         name: "Coffee",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 30 * TIME_FORMATS.MINUTE,
+        value: 155,
         icon: '☕',
-        rarity: "common",
-        unlockLevel: 1
+        rarity: "uncommon",
+        unlockLevel: 5
     },
     cotton: {
         name: "Cotton",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 2 * TIME_FORMATS.DAY,
+        value: 1850,
         icon: '🌿',
-        rarity: "common",
-        unlockLevel: 1
+        rarity: "uncommon",
+        unlockLevel: 6
     },
     cucumber: {
         name: "Cucumber",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 4 * TIME_FORMATS.HOUR,
+        value: 210,
         icon: '🥒',
         rarity: "common",
-        unlockLevel: 1
+        unlockLevel: 7
     },
     eggplant: {
         name: "Eggplant",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 12 * TIME_FORMATS.HOUR,
+        value: 1100,
         icon: '🍆',
-        rarity: "common",
-        unlockLevel: 1
+        rarity: "uncommon",
+        unlockLevel: 8
     },
     garlic: {
         name: "Garlic",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 12 * TIME_FORMATS.MINUTE,
+        value: 68,
         icon: '🧄',
         rarity: "common",
-        unlockLevel: 1
+        unlockLevel: 10
     },
     lettuce: {
         name: "Lettuce",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 1 * TIME_FORMATS.HOUR,
+        value: 225,
         icon: '🥬',
         rarity: "common",
-        unlockLevel: 1
+        unlockLevel: 12
     },
-    potatoe: {
+    potato: {
         name: "Potato",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 10 * TIME_FORMATS.MINUTE,
+        value: 66,
         icon: '🥔',
         rarity: "common",
-        unlockLevel: 1
+        unlockLevel: 14
     },
     peas: {
         name: "Peas",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 5 * TIME_FORMATS.DAY,
+        value: 4100,
         icon: '🟢',
-        rarity: "common",
-        unlockLevel: 1
+        rarity: "uncommon",
+        unlockLevel: 15
     },
     spinach: {
         name: "Spinach",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 2 * TIME_FORMATS.HOUR,
+        value: 215,
         icon: '🥬',
         rarity: "common",
-        unlockLevel: 1
+        unlockLevel: 15
     },
     strawberry: {
         name: "Strawberry",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 8 * TIME_FORMATS.DAY,
+        value: 9400,
         icon: '🍓',
-        rarity: "common",
-        unlockLevel: 1
+        rarity: "uncommon",
+        unlockLevel: 17
     },
     sweat_potato: {
         name: "Sweet Potato",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 28 * TIME_FORMATS.HOUR,
+        value: 2400,
         icon: '🍠',
         rarity: "common",
-        unlockLevel: 1
+        unlockLevel: 18
     },
     tomato: {
         name: "Tomato",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 25 * TIME_FORMATS.MINUTE,
+        value: 820,
         icon: '🍅',
         rarity: "common",
-        unlockLevel: 1
+        unlockLevel: 18
     },
     watermelon: {
         name: "Watermelon",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 7 * TIME_FORMATS.MINUTE,
+        value: 290,
         icon: '🍉',
         rarity: "common",
-        unlockLevel: 1
+        unlockLevel: 19
     },
     wheat: {
         name: "Wheat",
         category: "crop",
-        time: 4500,
-        value: 7,
+        time: 36 * TIME_FORMATS.HOUR,
+        value: 9800,
         icon: '🌾',
         rarity: "common",
-        unlockLevel: 1
+        unlockLevel: 20
     },
     // High-value crops
     golden_wheat: {
         name: "Golden Wheat",
         category: "crop",
-        time: 4 * TIME_FORMATS.HOUR, // 4 hours
-        value: 150,
+        time: 1 * TIME_FORMATS.HOUR,
+        value: 420,
         icon: '🌾',
         rarity: "legendary",
         unlockLevel: 15
@@ -403,11 +403,11 @@ const CROPS = {
     mystic_berry: {
         name: "Mystic Berry",
         category: "crop", 
-        time: 2 * TIME_FORMATS.DAY, // 2 days
-        value: 500,
+        time: 1 * TIME_FORMATS.DAY,
+        value: 5400,
         icon: '🫐',
         rarity: "mythic",
-        unlockLevel: 25
+        unlockLevel: 35
     },
 };
 
