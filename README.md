@@ -32,11 +32,7 @@ Plant crops, wait for them to grow, harvest them for coins and XP, unlock more l
 This project is **actively in development**.
 
 Planned features:
-- Save / load system
-- XP and player leveling (XP gained on harvest)
-- Unlock land tiles using in-game currency
-- Multiple crops with different growth times and values
-- Long-term plants (trees)
-- Better progression balancing
-- UI/UX polish
 - Animations and feedback improvements
+- Better progression balancing
+- Long-term plants (trees)
+- UI/UX polish
