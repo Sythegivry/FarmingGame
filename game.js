@@ -25,12 +25,117 @@ function formatTimeRemaining(ms) {
 
 // Return crop growth progress
 function getGrowthProgress(tile) {
-    if (!tile.isGrowing() || !tile.plantedAt || !tile.cropId)
-    return 0;
-
-    const elapsed = Date.now() - tile.plantedAt;
+    if (!tile.isGrowing() || !tile.plantedAt || !tile.cropId) {
+        return 0;
+    }
+    
     const totalTime = GameData.getCropGrowTime(tile.cropId);
-    return Math.min(elapsed / totalTime, 1); // Claimp UI bars if timers desync
+    if (!totalTime || totalTime <= 0) {
+        return 0;
+    }
+    
+    const elapsed = Math.max(0, Date.now() - tile.plantedAt);
+    return Math.min(elapsed / totalTime, 1);
+
+}
+
+// ========== EXPERIENCE & LEVELING SYSTEM ==========
+
+// Player progression system
+const player = {
+  level: 1,
+  xp: 0,
+  xpToNext: 100
+};
+
+// Rarity XP multipliers
+const RARITY_XP = {
+  common: 1,
+  uncommon: 1.5,
+  rare: 2.5,
+  epic: 5,
+  legendary: 7,
+  mythic: 12
+};
+
+// Calculate XP for a crop based on its time and rarity
+function getCropXP(crop) {
+  const baseXP = Math.max(1, Math.round(crop.time / 5000));
+  return Math.floor(baseXP * RARITY_XP[crop.rarity]);
+}
+
+// Event System for decoupling gameplay mechanics
+const EventSystem = {
+  listeners: {},
+  
+  // Subscribe to an event
+  on(event, callback) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event].push(callback);
+  },
+  
+  // Emit an event
+  emit(event, data) {
+    if (this.listeners[event]) {
+      this.listeners[event].forEach(callback => callback(data));
+    }
+  },
+  
+  // Unsubscribe from an event
+  off(event, callback) {
+    if (this.listeners[event]) {
+      this.listeners[event] = this.listeners[event].filter(cb => cb !== callback);
+    }
+  }
+};
+
+// XP System Event Listeners
+EventSystem.on('cropHarvested', (data) => {
+  // Award XP when crops are harvested
+  const crop = GameData.getCropData(data.cropId);
+  if (crop) {
+    const xpGained = getCropXP(crop);
+    gainXP(xpGained);
+  }
+});
+
+// Level up event listener to refresh crop selector
+EventSystem.on('playerLevelUp', (data) => {
+  // Refresh crop selector to show newly unlocked crops
+  initCropSelector();
+});
+
+// Gain XP and handle level progression
+function gainXP(amount) {
+  player.xp += amount;
+
+  while (player.xp >= player.xpToNext) {
+    player.xp -= player.xpToNext;
+    levelUp();
+  }
+}
+
+// Calculate XP needed for next level (progressive scaling)
+function xpForLevel(level) {
+  return Math.floor(100 * Math.pow(1.2, level - 1));
+}
+
+// Handle level up
+function levelUp() {
+  player.level++;
+  player.xpToNext = xpForLevel(player.level);
+  
+  // Emit level up event for future features
+  EventSystem.emit('playerLevelUp', { newLevel: player.level });
+  
+  console.log(`Level up! Now level ${player.level}`);
+}
+
+// Check if crop is unlocked based on player level
+function isCropUnlocked(crop) {
+  return player.level >= crop.unlockLevel;
 }
 
 // ======== Save & Load System ========
@@ -39,11 +144,13 @@ function saveGame() {
         version: "0.1",
         coins: farm.coins,
         selectedCrop: farm.selectedCrop,
+        unlockedTiles: farm.unlockedTiles,
         farmGrid: farm.grid.map(tile => ({
             state: tile.state,
             cropId: tile.cropId,
             plantedAt: tile.plantedAt
         })),
+        player: player,
         lastSavedAt: Date.now()
     };
     
@@ -65,7 +172,15 @@ function loadGame() {
     try {
         const save = JSON.parse(data);
         farm.coins = save.coins || 0;
-        farm.selectedCrop = save.selectedCrop || 'carrot';
+        farm.selectedCrop = save.selectedCrop || 'corn';
+        farm.unlockedTiles = save.unlockedTiles || 1;
+
+        // Load player progression
+        if (save.player) {
+            player.level = save.player.level || 1;
+            player.xp = save.player.xp || 0;
+            player.xpToNext = save.player.xpToNext || 100;
+        }
         
         // Restore grid
         farm.grid = save.farmGrid.map(tileData => {
@@ -126,7 +241,7 @@ function clearSave() {
 // Auto-save on 60s
 let autoSaveInterval;
 function startAutoSave() {
-    autoSaveInterval = setInterval (() => {
+    autoSaveInterval = setInterval(() => {
         console.log("Auto-saving game...");
         saveGame();
     }, 60000);
@@ -139,7 +254,7 @@ function stopAutoSave() {
     }
 }
 
-// Tile State System
+// ======== Tile State System ========
 const TILE_STATE = {
     EMPTY: "empty",
     GROWING: "growing",
@@ -148,67 +263,7 @@ const TILE_STATE = {
     FERTILIZED: "fertilized" // Future expansion
 };
 
-// Tile constructor
-class Tile {
-    constructor() {
-        this.state = TILE_STATE.EMPTY;
-        this.cropId = null;
-        this.plantedAt = null;
-    }
-    
-    // State transition helper
-    plant(cropId) {
-        this.state = TILE_STATE.GROWING;
-        this.cropId = cropId;
-        this.plantedAt = Date.now();
-    }
-    
-    markReady() {
-        this.state = TILE_STATE.READY;
-    }
-    
-    harvest() {
-        this.state = TILE_STATE.EMPTY;
-        this.cropId = null;
-        this.plantedAt = null;
-    }
-        
-    isReady() {
-        return this.state === TILE_STATE.READY;
-    }
-    
-    isEmpty() {
-        return this.state === TILE_STATE.EMPTY;
-    }
-    
-    isGrowing() {
-        return this.state === TILE_STATE.GROWING;
-    }
-    
-    // Time based check on crops
-    checkGrowthProgress() {
-        if (this.isGrowing() && this.plantedAt && this.cropId) {
-            const elapsed = Date.now() - this.plantedAt;
-            const cropGrowTime = GameData.getCropGrowTime(this.cropId);
-            
-            if (elapsed >= cropGrowTime) {
-                this.markReady();
-                return true; // State changed
-            }
-        }
-        return false; // No state change
-    }
-    getTimeRemaining(){
-        if (!this.isGrowing() || !this.plantedAt || !this.cropId)
-            return 0;
-
-        const elapsed = Date.now() - this.plantedAt;
-        const totalTime = GameData.getCropGrowTime(this.cropId);
-        return Math.max(totalTime - elapsed, 0);
-    }
-}
-
-// Crop 
+// Crops
 const CROPS = {
     corn: {
         name: "Corn",
@@ -354,7 +409,7 @@ const CROPS = {
         rarity: "uncommon",
         unlockLevel: 17
     },
-    sweat_potato: {
+    sweet_potato: {
         name: "Sweet Potato",
         category: "crop",
         time: 28 * TIME_FORMATS.HOUR,
@@ -443,14 +498,75 @@ const GameData = {
     }
 };
 
+// Tile constructor
+class Tile {
+    constructor() {
+        this.state = TILE_STATE.EMPTY;
+        this.cropId = null;
+        this.plantedAt = null;
+    }
+    
+    // State transition helper
+    plant(cropId) {
+        this.state = TILE_STATE.GROWING;
+        this.cropId = cropId;
+        this.plantedAt = Date.now();
+    }
+    
+    markReady() {
+        this.state = TILE_STATE.READY;
+    }
+    
+    harvest() {
+        this.state = TILE_STATE.EMPTY;
+        this.cropId = null;
+        this.plantedAt = null;
+    }
+        
+    isReady() {
+        return this.state === TILE_STATE.READY;
+    }
+    
+    isEmpty() {
+        return this.state === TILE_STATE.EMPTY;
+    }
+    
+    isGrowing() {
+        return this.state === TILE_STATE.GROWING;
+    }
+    
+    // Time based check on crops
+    checkGrowthProgress() {
+        if (this.isGrowing() && this.plantedAt && this.cropId) {
+            const elapsed = Date.now() - this.plantedAt;
+            const cropGrowTime = GameData.getCropGrowTime(this.cropId);
+            
+            if (elapsed >= cropGrowTime) {
+                this.markReady();
+                return true; // State changed
+            }
+        }
+        return false; // No state change
+    }
+    getTimeRemaining(){
+        if (!this.isGrowing() || !this.plantedAt || !this.cropId)
+            return 0;
+
+        const elapsed = Date.now() - this.plantedAt;
+        const totalTime = GameData.getCropGrowTime(this.cropId);
+        return Math.max(totalTime - elapsed, 0);
+    }
+}
+
 // Farm
 const SIZE = 5;
-const GROW_TIME = 5000; // 5 seconds
 
 const farm = {
     coins: 0,
     grid: [],
-    selectedCrop: 'corn' // Default selected crop
+    selectedCrop: 'corn', // Default selected crop
+    maxTiles: 25, // Total grid size
+    unlockedTiles: 1 // Only tiles with index < unlockedTiles are usable
 };
 
 // Init tile structure
@@ -464,12 +580,17 @@ const coinsEl = document.getElementById("coins");
 const cropSelectorEl = document.getElementById("crop-selector");
 
 function render() {
+    if (!farmEl || !coinsEl) return;
     farmEl.innerHTML = "";
     
     farm.grid.forEach((tile, index) => {
         const el = document.createElement("div");
         el.className = "tile";
         
+        if (index >= farm.unlockedTiles) {
+            el.classList.add("locked");
+            el.textContent = "🔒";
+        } else {
         // Check transition on growth
         tile.checkGrowthProgress();
         
@@ -497,16 +618,41 @@ function render() {
             const cropIcon = GameData.getCropIcon(tile.cropId);
             el.textContent = cropIcon;
         }
-
+    }
         el.onclick = () => handleTileClick(index);
         farmEl.appendChild(el);
     });
     
     coinsEl.textContent = `Coins: ${farm.coins}`;
+
+    // Update player stats
+    renderPlayerStats();
+}
+
+// Render player Stats (level, xp, progress bar)
+function renderPlayerStats() {
+    const levelEl = document.getElementById("level-display");
+    const xpEl = document.getElementById("xp-display");
+    const progressFillEl = document.getElementById("xp-progress-fill");
+
+    if (levelEl) {
+        levelEl.textContent = `Level: ${player.level}`;
+    }
+
+    if (xpEl) {
+        xpEl.textContent = `XP: ${player.xp} / ${player.xpToNext}`;
+    }
+
+    if (progressFillEl) {
+        const progress = (player.xp / player.xpToNext) * 100;
+        progressFillEl.style.width = `${progress}%`;
+    }
 }
 
 // Plant / Harvest Logic
 function handleTileClick(index) {
+    if (index >= farm.unlockedTiles) // Block interaction with locked tiles
+        return;
     const tile = farm.grid[index];
     
     // Empty > Plant
@@ -518,8 +664,12 @@ function handleTileClick(index) {
     // Planted > Check if ready
     if (tile.isReady()) {
         const cropValue = GameData.getCropValue(tile.cropId);
+        const cropId = tile.cropId;
         tile.harvest();
         farm.coins += cropValue;
+
+        // Harvest event
+        EventSystem.emit('cropHarvested', {cropId});
     }
 }
 
@@ -532,6 +682,7 @@ function selectCrop(cropName) {
 }
 
 function updateCropSelectorUI() {
+    if (!cropSelectorEl) return;
     const buttons = cropSelectorEl.querySelectorAll('.crop-btn');
     buttons.forEach(btn => {
         if (btn.dataset.crop === farm.selectedCrop) {
@@ -543,6 +694,10 @@ function updateCropSelectorUI() {
 }
 
 function initCropSelector() {
+    if (!cropSelectorEl) {
+        console.warn("crop-selector element not found!")
+        return;
+    }
     cropSelectorEl.innerHTML = '';
     
     // Wrapper div and header for crop selection
@@ -564,8 +719,15 @@ function initCropSelector() {
         const btn = document.createElement('button');
         btn.className = 'crop-btn';
         btn.dataset.crop = cropId;
-        btn.innerHTML = `${cropData.icon} ${cropData.name}`;
-        btn.onclick = () => selectCrop(cropId);
+
+        if (isCropUnlocked(cropData)) {
+            btn.innerHTML = `${cropData.icon} ${cropData.name}`;
+            btn.onclick = () => selectCrop(cropId);
+        } else {
+            btn.innerHTML = `🔒 ${cropData.icon} ${cropData.name} (Lv.${cropData.unlockLevel})`;
+            btn.disabled = true;
+            btn.classList.add('locked');
+        }
         cropsSection.appendChild(btn);
     });
     
@@ -575,6 +737,43 @@ function initCropSelector() {
     updateCropSelectorUI();
 }
 
+function tileUnlockCost(tileCount) {
+    return Math.floor(75 * Math.pow(tileCount, 1.9));
+}
+
+const unlockBtn = document.getElementById("unlockTileBtn");
+
+function updateUnlockButton() {
+    if (!unlockBtn) return;
+    if (farm.unlockedTiles >= farm.maxTiles) {
+        unlockBtn.disabled = true;
+        unlockBtn.textContent = "All tiles unlocked";
+        return;
+    }
+    
+    const cost = tileUnlockCost(farm.unlockedTiles);
+    
+    if (farm.coins >= cost) {
+        unlockBtn.disabled = false;
+        unlockBtn.textContent = `Unlock Tile (${cost} coins)`;
+    } else {
+        unlockBtn.disabled = true;
+        unlockBtn.textContent = `Unlock Tile (${cost} coins)`;
+    }
+}
+
+unlockBtn.onclick = () => {
+    const cost = tileUnlockCost(farm.unlockedTiles);
+    
+    if (farm.coins < cost) return;
+    
+    farm.coins -= cost;
+    farm.unlockedTiles++;
+    
+    updateUnlockButton();
+    render();
+};
+  
 function initSaveLoadButtons() {
     const saveBtn = document.getElementById("manual-save-button");
     const loadBtn = document.getElementById("manual-load-button");
@@ -588,6 +787,7 @@ function initSaveLoadButtons() {
     if (loadBtn) {
         loadBtn.onclick = () => {
             loadGame();
+            updateUnlockButton();
             render(); // Refresh display after loading
         };
     }
@@ -595,8 +795,10 @@ function initSaveLoadButtons() {
     
 
 // Initialize
+loadGame();
 initCropSelector();
 initSaveLoadButtons();
+updateUnlockButton();
 render();
 startAutoSave();
 

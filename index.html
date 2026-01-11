@@ -11,21 +11,34 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <section class="menu-area">
+        <button type="button" id="manual-save-button">Save</button>
+        <button type="button" id="manual-load-button">Load</button>
+        <section id="farm-utilities">
+            <button type="button" id="unlockTileBtn">Buy more land</button>
+        </section>
+    </section>
+
     <main>
         <section id="farm">
 
         </section>
-        <section id="coins">
-            <strong>Coins: </strong>
-        </section>
-        <section id="crop-selector">
-
-        </section>
     </main>
+    <section id="coins">
+        <strong>Coins: </strong>
+    </section>
 
-    <button type="button" id="manual-save-button">Save</button>
-    <button type="button" id="manual-load-button">Load</button>
-    
+    <section id="player-stats">
+        <div id="level-display">Level: 1</div>
+        <div id="xp-display">XP: 0 / 100</div>
+        <div id="xp-progress-bar">
+            <div id="xp-progress-fill"></div>
+        </div>
+    </section>
+
+    <section id="crop-selector">
+    </section>
+
     <footer id="game-footer">
         © 2025 Sythegivry — <a href="LICENSE" target="_blank">MIT License</a>
     </footer>

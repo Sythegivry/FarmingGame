@@ -1,13 +1,20 @@
 * {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
     font-family: system-ui, Arial, Helvetica, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
 }
 
 body {
     width: 100%;
     height: auto;
+    background: #c3c3c3;
+}
+
+main {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1em;
+    width: 100%;
+    height: 100%;
 }
 
 #farm {
@@ -15,47 +22,63 @@ body {
     grid-template-columns: repeat(5, 80px);
     gap: 8px;
     justify-content: center;
+    
 }
 
+#coins {
+    color: #000000;
+    text-shadow: -1px 1px 0px #5f1bc4;
+}
+
+/* Main tiles */
 .tile {
     width: 80px;
     height: 80px;
-    background: #7cfc98;
     border: 2px solid #2f7d32;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     font-family: sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
 }
 
 /* Tile color states */
 .tile.empty {
-    background: #5ee27a;
+    background: #5ee27a; /* Green for empty tiles */
 }
 
 .tile.growing {
-    background: #358cb1;
+    background: #358cb1; /* Blue for growing tiles */
 }
 
 .tile.ready {
-    background: #ffc800;
+    background: #ffc800; /* Yellow for ready tiles */
     animation: pulse 5s infinite;
 }
 
-@keyframes pulse {
-    0% {transform: scale(1);}
-    50% {transform: scale(1.05);}
-    100% {transform: scale(1);}
+.tile.locked {
+    background: #ccc; /* Gray for locked tiles */
+    color: #606060;
+    cursor: not-allowed;
 }
 
-/* Crop selector */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Crop selector styles */
 #crop-selector {
     margin: 20px;
     padding: 15px;
-    background: #f5f5f5;
+    background: #c2b194;
     border-radius: 8px;
-    border: 1px solid #f5deb3;
+    border: 1px solid #9e6f2d;
+    box-shadow: #8c5f23 0px -0.1rem 1rem 0px;
 }
 
 .crop-section {
@@ -73,7 +96,7 @@ body {
     display: inline-block;
     margin: 4px;
     padding: 8px 12px;
-    background: #f5f5f5;
+    background: #e0e0e0;
     border: 2px solid #999999;
     border-radius: 6px;
     cursor: pointer;
@@ -84,7 +107,7 @@ body {
 
 .crop-btn:hover {
     background: #d0d0d0;
-    border-color: #777777;
+    border-color: #777;
 }
 
 .crop-btn.selected {
@@ -95,4 +118,103 @@ body {
 
 .crop-btn.selected:hover {
     background: #45a049;
+}
+
+.crop-btn.locked {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.crop-btn.locked:hover {
+    background: #ccc;
+}
+
+/* Player stats styles */
+#player-stats {
+    margin: 20px;
+    padding: 15px;
+    background: #c2b194;
+    border-radius: 8px;
+    border: 1px solid #9e6f2d;
+    box-shadow: #8c5f23 0px -0.1rem 1rem 0px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+#level-display {
+    font-size: 18px;
+    font-weight: bold;
+    color: #b3442d;
+    margin-bottom: 8px;
+}
+
+#xp-display {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+#xp-progress-bar {
+    width: 100%;
+    height: 20px;
+    background: #c0c0c0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #ccc;
+}
+
+#xp-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* Menu Area */
+.menu-area {
+    display: inline-flex;
+    flex-direction: column;
+}
+
+#manual-save-button, #manual-load-button {
+    width: 60px;
+    text-align: center;
+    border: #6a5acd 2px solid;
+    color: #fff;
+    background-color: #3A424B;
+    padding: .5rem;
+    margin: .15rem 0;
+}
+
+/* Utility Buttons */
+#farm-utilities {
+    margin-top: 1rem;
+    display: inline-block;
+}
+
+#farm-utilities button {
+    background-color: #3A424B;
+    color: #fff;
+    border-radius: 12px;
+    border: #6a5acd 2px solid;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    #farm {
+        grid-template-columns: repeat(5, 60px);
+        gap: 6px;
+    }
+    
+    .tile {
+        width: 60px;
+        height: 60px;
+        font-size: 12px;
+    }
+    
+    .crop-btn {
+        font-size: 12px;
+        padding: 6px 8px;
+    }
 }
