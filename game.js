@@ -574,10 +574,30 @@ for (let i = 0; i < SIZE * SIZE; i++) {
     farm.grid.push(new Tile());
 }
 
-// Render Grid
+// HTML Elements
 const farmEl = document.getElementById("farm");
 const coinsEl = document.getElementById("coins");
 const cropSelectorEl = document.getElementById("crop-selector");
+const tooltip = document.getElementById("tooltip");
+
+// ======== FLOATING TOOLTIP ========
+document.addEventListener("mousemove", e => {
+    if (tooltip.classList.contains("hidden")) return;
+    tooltip.style.left = e.clientX + 14 + "px";
+    tooltip.style.top = e.clientY + 14 + "px";
+});
+
+document.addEventListener("mouseout", e => {
+    tooltip.classList.add("hidden");
+});
+
+document.addEventListener("mouseover", e => {
+    const target = e.target.closest("[data-tooltip]");
+    if (!target) return;
+
+    tooltip.innerHTML = target.dataset.tooltip;
+    tooltip.classList.remove("hidden");
+});
 
 function render() {
     if (!farmEl || !coinsEl) return;
@@ -722,6 +742,7 @@ function initCropSelector() {
 
         if (isCropUnlocked(cropData)) {
             btn.innerHTML = `${cropData.icon} ${cropData.name}`;
+            btn.dataset.tooltip = `<b>${cropData.name}</b><br>⏱ ${formatTimeRemaining(cropData.time)}<br>💰 ${cropData.value} coins`;
             btn.onclick = () => selectCrop(cropId);
         } else {
             btn.innerHTML = `🔒 ${cropData.icon} ${cropData.name} (Lv.${cropData.unlockLevel})`;
