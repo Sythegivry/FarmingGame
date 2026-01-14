@@ -50,7 +50,7 @@ const player = {
 
 // Rarity XP multipliers
 const RARITY_XP = {
-  common: 1,
+  common: 1.2,
   uncommon: 1.5,
   rare: 2.5,
   epic: 5,
@@ -60,8 +60,10 @@ const RARITY_XP = {
 
 // Calculate XP for a crop based on its time and rarity
 function getCropXP(crop) {
-  const baseXP = Math.max(1, Math.round(crop.time / 5000));
-  return Math.floor(baseXP * RARITY_XP[crop.rarity]);
+    const minutes = crop.time / 60000;
+    
+    const baseXP = Math.log2(minutes + 1) * 5;
+    return Math.floor(baseXP * RARITY_XP[crop.rarity]);
 }
 
 // Event System for decoupling gameplay mechanics
