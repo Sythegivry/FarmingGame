@@ -177,7 +177,7 @@ main {
     flex-direction: column;
 }
 
-#manual-save-button, #manual-load-button {
+#manual-save-button, #manual-load-button, #export-save-button, #import-save-button {
     width: 60px;
     text-align: center;
     border: #6a5acd 2px solid;
@@ -200,6 +200,32 @@ main {
     border: #6a5acd 2px solid;
 }
 
+.tooltip {
+    position: fixed;
+    background: #222222;
+    color: #ffffff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 18px;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 99;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.tooltip.hidden {
+    display: none;
+}
+
+#game-footer {
+    color:#00000030;
+}
+
+#game-footer a {
+    text-decoration: none;
+    color: #00000030;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
     #farm {
@@ -217,21 +243,4 @@ main {
         font-size: 12px;
         padding: 6px 8px;
     }
-}
-
-.tooltip {
-  position: fixed;
-  background: #222222;
-  color: #ffffff;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 18px;
-  pointer-events: none;
-  white-space: nowrap;
-  z-index: 99;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-.tooltip.hidden {
-  display: none;
 }

@@ -1,3 +1,86 @@
+// Import/Export Save System
+
+// Save payload
+function getSaveData() {
+  return {
+    version: 1,
+    savedAt: Date.now(),
+    coins: farm.coins,
+    selectedCrop: farm.selectedCrop,
+    unlockedTiles: farm.unlockedTiles,
+    farmGrid: farm.grid.map(tile => ({
+        state: tile.state,
+        cropId: tile.cropId,
+        plantedAt: tile.plantedAt
+    })),
+    player: player
+  };
+}
+
+// Base64 Encode to safe text string
+function exportSaveAsText() {
+  const saveData = getSaveData();
+  const json = JSON.stringify(saveData);
+  return btoa(json);
+}
+
+// Import from text
+function importSaveFromText(encoded) {
+    try {
+        const json = atob(encoded.trim());
+        const data = JSON.parse(json);
+
+        if (!data || !data.version) {
+            throw new Error("Invalid save format!");
+        }
+
+        // Validate version
+        if (data.version !== 1) {
+            throw new Error(`Incompatible save version: ${data.version}. Current version: 0.1`);
+        }
+
+        // Confirm import
+        if (!confirm("This will overwrite your current save. Continue?")) {
+            return;
+        }
+
+        farm.coins = data.coins || 0;
+        farm.selectedCrop = data.selectedCrop || 'corn';
+        farm.unlockedTiles = data.unlockedTiles || 1;
+
+        // Load player progression
+        if (data.player) {
+            player.level = data.player.level || 1;
+            player.xp = data.player.xp || 0;
+            player.xpToNext = data.player.xpToNext || 100;
+        }
+
+        // Restore grid
+        farm.grid = data.farmGrid.map(tileData => {
+            const tile = new Tile();
+            tile.state = tileData.state || TILE_STATE.EMPTY;
+            tile.cropId = tileData.cropId;
+            tile.plantedAt = tileData.plantedAt;
+
+            // Check offline growth
+            if (tile.isGrowing() && tile.plantedAt && tile.cropId) {
+                tile.checkGrowthProgress();
+            }
+
+            return tile;
+        });
+
+        saveGame();
+        render();
+
+        console.log("Save imported successfully!");
+        showSaveStatus("Save imported!");
+    } catch (err) {
+        console.error("Failed to import save:", err.message);
+        showSaveStatus("Import failed: " + err.message);
+    }
+}
+
 // Time utils
 const TIME_FORMATS = {
     SECOND: 1000,
@@ -800,18 +883,38 @@ unlockBtn.onclick = () => {
 function initSaveLoadButtons() {
     const saveBtn = document.getElementById("manual-save-button");
     const loadBtn = document.getElementById("manual-load-button");
-    
+    const exportBtn = document.getElementById("export-save-button");
+    const importBtn = document.getElementById("import-save-button");
+
     if (saveBtn) {
         saveBtn.onclick = () => {
             saveGame();
         };
     }
-    
+
     if (loadBtn) {
         loadBtn.onclick = () => {
             loadGame();
             updateUnlockButton();
             render(); // Refresh display after loading
+        };
+    }
+
+    if (exportBtn) {
+        exportBtn.onclick = () => {
+            const saveString = exportSaveAsText();
+            prompt("Save this text somewhere safe:", saveString);
+        };
+    }
+
+    if (importBtn) {
+        importBtn.onclick = () => {
+            const saveString = prompt("Paste your save text:");
+            if (saveString) {
+                importSaveFromText(saveString);
+                updateUnlockButton();
+                render(); // Refresh display after importing
+            }
         };
     }
 }
