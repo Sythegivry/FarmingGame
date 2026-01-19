@@ -1,6 +1,34 @@
-// Import/Export Save System
+const pageButtons = document.querySelectorAll('.page-switcher button');
+const pages = document.querySelectorAll('.page');
 
-// Save payload
+function switchPage(pageName) {
+  // Hide all pages
+  pages.forEach(page => {
+    page.classList.remove('active');
+  });
+
+  // Deactivate all buttons
+  pageButtons.forEach(btn => {
+    btn.classList.remove('active');
+  });
+
+  // Activate selected page
+  const page = document.querySelector(`.page[data-page="${pageName}"]`);
+  const button = document.querySelector(`.page-switcher button[data-page="${pageName}"]`);
+
+  if (page) page.classList.add('active');
+  if (button) button.classList.add('active');
+}
+
+// Attach events
+pageButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const pageName = button.dataset.page;
+    switchPage(pageName);
+  });
+});
+
+// ========== Export/Import Save ==========
 function getSaveData() {
   return {
     version: 1,
@@ -918,12 +946,32 @@ function initSaveLoadButtons() {
         };
     }
 }
+
+function initHamburgerMenu() {
+    const hamburgerBtn = document.getElementById("hamburger-menu");
+    const dropdownMenu = document.getElementById("dropdown-menu");
+
+    if (hamburgerBtn && dropdownMenu) {
+        hamburgerBtn.addEventListener("click", () => {
+            const isVisible = dropdownMenu.style.display === "flex";
+            dropdownMenu.style.display = isVisible ? "none" : "flex";
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", (event) => {
+            if (!hamburgerBtn.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.style.display = "none";
+            }
+        });
+    }
+}
     
 
 // Initialize
 loadGame();
 initCropSelector();
 initSaveLoadButtons();
+initHamburgerMenu();
 updateUnlockButton();
 render();
 startAutoSave();

@@ -11,24 +11,24 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <section class="menu-area">
-        <button type="button" id="manual-save-button">Save</button>
-        <button type="button" id="manual-load-button">Load</button>
-        <button type="button" id="export-save-button">Export Save</button>
-        <button type="button" id="import-save-button">Import Save</button>
-        <section id="farm-utilities">
-            <button type="button" id="unlockTileBtn">Buy more land</button>
-        </section>
-    </section>
-
-    <main>
-        <section id="farm">
-
-        </section>
-    </main>
-    <section id="coins">
-        <strong>Coins: </strong>
-    </section>
+    <nav class="page-switcher">
+        <div class="page-buttons">
+            <button data-page="farm" class="active">Farm</button>
+            <!-- <button data-page="trees">Trees</button>
+            <button data-page="animals">Animals</button> -->
+        </div>
+        <button type="button" id="hamburger-menu" class="hamburger-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div id="dropdown-menu" class="dropdown-menu">
+            <button type="button" id="manual-save-button">Save</button>
+            <button type="button" id="manual-load-button">Load</button>
+            <button type="button" id="export-save-button">Export Save</button>
+            <button type="button" id="import-save-button">Import Save</button>
+        </div>
+    </nav>
 
     <section id="player-stats">
         <div id="level-display">Level: 1</div>
@@ -36,10 +36,32 @@
         <div id="xp-progress-bar">
             <div id="xp-progress-fill"></div>
         </div>
+        <section id="coins">
+            <strong>Coins: </strong>
+        </section>
     </section>
 
-    <section id="crop-selector">
-    </section>
+    <main id="pages">
+        
+        <section id="farm" class="page active" data-page="farm">
+            <!-- Main Farm -->
+        </section>
+        <section id="farm-utilities">
+            <button type="button" id="unlockTileBtn">Buy more land</button>
+        </section>
+        <section id="crop-selector">
+            <!-- Main Farm -->
+        </section>
+
+        <section class="page" data-page="trees">
+            <!-- Trees Farm -->
+        </section>
+
+        <section class="page" data-page="animals">
+            <!-- Animals Farm -->
+        </section>
+    </main>
+
 
     <div id="tooltip" class="tooltip hidden"></div>
     

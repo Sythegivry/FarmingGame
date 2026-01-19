@@ -27,7 +27,7 @@ main {
 
 #coins {
     color: #000000;
-    text-shadow: -1px 1px 0px #5f1bc4;
+    padding-top: .5rem;
 }
 
 /* Main tiles */
@@ -141,6 +141,7 @@ main {
     box-shadow: #8c5f23 0px -0.1rem 1rem 0px;
     text-align: center;
     transition: all 0.2s;
+    width: 15%;
 }
 
 #level-display {
@@ -151,7 +152,7 @@ main {
 }
 
 #xp-display {
-    font-size: 14px;
+    font-size: 16px;
     margin-bottom: 8px;
 }
 
@@ -171,20 +172,14 @@ main {
     transition: width 0.3s ease;
 }
 
-/* Menu Area */
-.menu-area {
-    display: inline-flex;
-    flex-direction: column;
-}
-
 #manual-save-button, #manual-load-button, #export-save-button, #import-save-button {
-    width: 60px;
+    width: 120px;
     text-align: center;
     border: #6a5acd 2px solid;
     color: #fff;
     background-color: #3A424B;
-    padding: .5rem;
-    margin: .15rem 0;
+    padding: .5rem 1rem;
+    margin: .3rem .2rem;
 }
 
 /* Utility Buttons */
@@ -225,6 +220,87 @@ main {
     text-decoration: none;
     color: #00000030;
 }
+
+/* Page switcher bar */
+.page-switcher {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #222;
+  position: relative;
+}
+
+.page-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.page-switcher button {
+  padding: 8px 12px;
+  cursor: pointer;
+  background: #444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.page-switcher button.active {
+  background: #2ecc71;
+  color: #000;
+}
+
+/* Hamburger menu */
+.hamburger-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 50px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.hamburger-btn span {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: white;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 10px;
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 10px;
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 100;
+}
+
+.dropdown-menu button {
+  width: 100%;
+  text-align: left;
+}
+
+.page {
+  display: none;
+  padding: 16px;
+}
+
+.page.active {
+  display: block;
+}
+
 
 /* Responsive */
 @media (max-width: 600px) {
