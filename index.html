@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta http-equiv="X-UA-Compatible" content="IE=7">
 
     <title>Farm</title>
 
@@ -14,8 +13,7 @@
     <nav class="page-switcher">
         <div class="page-buttons">
             <button data-page="farm" class="active">Farm</button>
-            <!-- <button data-page="trees">Trees</button>
-            <button data-page="animals">Animals</button> -->
+            <button data-page="trees">Trees</button>
         </div>
         <button type="button" id="hamburger-menu" class="hamburger-btn">
             <span></span>
@@ -48,25 +46,30 @@
         </section>
         <section id="farm-utilities">
             <button type="button" id="unlockTileBtn">Buy more land</button>
+            <button type="button" id="shovelBtn" title="Remove mode">🪓 Remove</button>
         </section>
         <section id="crop-selector">
             <!-- Main Farm -->
         </section>
 
-        <section class="page" data-page="trees">
+        <section id="trees" class="page" data-page="trees">
             <!-- Trees Farm -->
         </section>
-
-        <section class="page" data-page="animals">
-            <!-- Animals Farm -->
+        <section id="tree-utilities">
+            <button type="button" id="unlockTreeTileBtn">Unlock Tree Tile</button>
+            <button type="button" id="shovelBtn" title="Remove mode">🪓 Remove</button>
+        </section>
+        <section id="tree-selector">
+            <!-- Tree Selector -->
         </section>
     </main>
 
 
     <div id="tooltip" class="tooltip hidden"></div>
-    
+    <div id="save-status"></div>
+
     <footer id="game-footer">
-        © 2025 Sythegivry — <a href="LICENSE" target="_blank">MIT License</a>
+        © 2026 Sythegivry — <a href="LICENSE" target="_blank">MIT License</a>
     </footer>
     <script src="game.js"></script>
 </body>

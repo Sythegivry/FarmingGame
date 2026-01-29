@@ -10,9 +10,11 @@ Plant crops, wait for them to grow, harvest them for coins and XP, unlock more l
 
 ## 🎮 Features
 
-- Grid-based farming system
+- Grid-based farming system with crops and trees
 - Offline-friendly (time-based growth using timestamps)
 - All game logic runs client-side
+- Save/load system with export/import
+- Level progression and unlocks
 
 ---
 
@@ -34,5 +36,5 @@ This project is **actively in development**.
 Planned features:
 - Animations and feedback improvements
 - Better progression balancing
-- Long-term plants (trees)
 - UI/UX polish
+- Additional content

@@ -1,5 +1,5 @@
 * {
-    font-family: system-ui, Arial, Helvetica, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
 }
 
 body {
@@ -15,14 +15,21 @@ main {
     gap: 1em;
     width: 100%;
     height: 100%;
+    position: relative;
+    z-index: 1;
 }
 
 #farm {
-    display: grid;
     grid-template-columns: repeat(5, 80px);
     gap: 8px;
     justify-content: center;
     
+}
+
+#trees {
+    grid-template-columns: repeat(3, 80px);
+    gap: 8px;
+    justify-content: center;
 }
 
 #coins {
@@ -47,28 +54,66 @@ main {
 
 /* Tile color states */
 .tile.empty {
-    background: #5ee27a; /* Green for empty tiles */
+    background: #5ee27a;
 }
 
 .tile.growing {
-    background: #358cb1; /* Blue for growing tiles */
+    background: #358cb1;
 }
 
 .tile.ready {
-    background: #ffc800; /* Yellow for ready tiles */
-    animation: pulse 5s infinite;
+    background: #ffc800;
+    animation: pulse 1000ms infinite;
+}
+
+@keyframes pulse {
+    0%   { transform: scale(1); }
+    50%   { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
 
 .tile.locked {
-    background: #ccc; /* Gray for locked tiles */
+    background: #ccc;
     color: #606060;
     cursor: not-allowed;
 }
 
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+/* Growing tile progress bar styles */
+.tile.growing .crop-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+.tile.growing .crop-emoji {
+    font-size: 20px;
+    margin-bottom: 2px;
+}
+
+.tile.growing .progress-bar {
+    width: 60px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 2px;
+}
+
+.tile.growing .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.tile.growing .time-remaining {
+    font-size: 10px;
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
 
 /* Crop selector styles */
@@ -131,8 +176,69 @@ main {
     background: #ccc;
 }
 
+/* Tree selector styles */
+#tree-selector {
+    margin: 20px;
+    padding: 15px;
+    background: #c2b194;
+    border-radius: 8px;
+    border: 1px solid #9e6f2d;
+    box-shadow: #8c5f23 0px -0.1rem 1rem 0px;
+}
+
+.tree-section {
+    margin-bottom: 20px;
+}
+
+.tree-section h3 {
+    margin: 0 0 10px 0;
+    color: #2f7d32;
+    font-size: 18px;
+    text-align: center;
+}
+
+.tree-btn {
+    display: inline-block;
+    margin: 4px;
+    padding: 8px 12px;
+    background: #e0e0e0;
+    border: 2px solid #999999;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.tree-btn:hover {
+    background: #d0d0d0;
+    border-color: #777;
+}
+
+.tree-btn.selected {
+    background: #4CAF50;
+    color: white;
+    border-color: #2f7d32;
+}
+
+.tree-btn.selected:hover {
+    background: #45a049;
+}
+
+.tree-btn.locked {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.tree-btn.locked:hover {
+    background: #ccc;
+}
+
 /* Player stats styles */
 #player-stats {
+    position: absolute;
     margin: 20px;
     padding: 15px;
     background: #c2b194;
@@ -195,21 +301,58 @@ main {
     border: #6a5acd 2px solid;
 }
 
+#tree-utilities {
+    margin-top: 1rem;
+    display: inline-block;
+}
+
+#tree-utilities button {
+    background-color: #3A424B;
+    color: #fff;
+    border-radius: 12px;
+    border: #6a5acd 2px solid;
+}
+
 .tooltip {
     position: fixed;
     background: #222222;
     color: #ffffff;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 18px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
     pointer-events: none;
     white-space: nowrap;
     z-index: 99;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    transform: translate(0, 0); /* Enable hardware acceleration */
 }
 
 .tooltip.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tooltip:not(.hidden) {
+    opacity: 1;
+}
+
+/* Save status notification */
+#save-status {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 100;
     display: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    border: 2px solid #333;
 }
 
 #game-footer {
@@ -223,84 +366,237 @@ main {
 
 /* Page switcher bar */
 .page-switcher {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background: #222;
-  position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #222;
+    position: relative;
+    z-index: 10;
 }
 
 .page-buttons {
-  display: flex;
-  gap: 8px;
+    display: flex;
+    gap: 8px;
 }
 
 .page-switcher button {
-  padding: 8px 12px;
-  cursor: pointer;
-  background: #444;
-  color: white;
-  border: none;
-  border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    background: #444;
+    color: white;
+    border: none;
+    border-radius: 4px;
 }
 
 .page-switcher button.active {
-  background: #2ecc71;
-  color: #000;
+    background: #2ecc71;
+    color: #000;
 }
 
 /* Hamburger menu */
 .hamburger-btn {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  width: 50px;
-  height: 40px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 50px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
 }
 
 .hamburger-btn span {
-  display: block;
-  width: 100%;
-  height: 3px;
-  background: white;
-  border-radius: 2px;
-  transition: all 0.3s ease;
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: white;
+    border-radius: 2px;
+    transition: all 0.3s ease;
 }
 
 /* Dropdown menu */
 .dropdown-menu {
-  position: absolute;
-  top: 100%;
-  right: 10px;
-  background: #333;
-  border: 1px solid #555;
-  border-radius: 4px;
-  padding: 10px;
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  z-index: 100;
+    position: absolute;
+    top: 70%;
+    right: 10px;
+    z-index: 5;
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 10px;
+    display: none;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .dropdown-menu button {
-  width: 100%;
-  text-align: left;
+    width: 100%;
+    text-align: left;
 }
 
 .page {
-  display: none;
-  padding: 16px;
+    display: none;
+    padding: 16px;
 }
 
 .page.active {
-  display: block;
+    display: grid;
 }
 
+
+/* Remove mode styles */
+.remove-mode .tile:hover {
+    outline: 2px solid red;
+    cursor: not-allowed;
+}
+
+#shovelBtn.active {
+    background-color: #ff4444;
+    color: white;
+    border-color: #cc0000;
+}
+
+/* Tile Tooltip Styles */
+.tile-tooltip {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+}
+
+.tile-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tile-icon {
+    font-size: 20px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tile-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.tile-category {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.8;
+}
+
+.tile-status {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #4ade80;
+}
+
+.ready-status {
+    color: #22c55e;
+    font-weight: 700;
+}
+
+.tile-progress {
+    margin-bottom: 10px;
+}
+
+.progress-label {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-bottom: 6px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #22c55e);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 10px;
+    color: #9ca3af;
+    text-align: right;
+}
+
+.tile-rewards {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.reward-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    padding: 4px 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.reward-icon {
+    font-size: 12px;
+    width: 16px;
+    text-align: center;
+}
+
+.reward-label {
+    color: #9ca3af;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.reward-value {
+    font-weight: 600;
+    margin-left: auto;
+}
+
+/* Rarity color borders */
+.tile-tooltip[style*="border-left: 4px solid"] {
+    border-radius: 6px;
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Tooltip for empty tiles */
+.tile-tooltip .tile-status {
+    color: #93c5fd;
+    font-weight: 500;
+}
+
+/* Tooltip for unknown plants */
+.tile-tooltip .tile-status {
+    color: #f87171;
+    font-weight: 500;
+}
 
 /* Responsive */
 @media (max-width: 600px) {
@@ -308,14 +604,32 @@ main {
         grid-template-columns: repeat(5, 60px);
         gap: 6px;
     }
-    
+
+    #trees {
+        grid-template-columns: repeat(3, 60px);
+        gap: 6px;
+    }
+
     .tile {
         width: 60px;
         height: 60px;
         font-size: 12px;
     }
-    
-    .crop-btn {
+
+    .tile.growing .crop-emoji {
+        font-size: 16px;
+    }
+
+    .tile.growing .progress-bar {
+        width: 40px;
+        height: 5px;
+    }
+
+    .tile.growing .time-remaining {
+        font-size: 9px;
+    }
+
+    .crop-btn, .tree-btn {
         font-size: 12px;
         padding: 6px 8px;
     }
